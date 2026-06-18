@@ -1,0 +1,209 @@
+// ============================================================
+// SA-staining quantification macro — generalised version
+// Colour Deconvolution with interactive stain vector calibration
+//
+// Workflow:
+//   1. Select input folder
+//   2. Draw ROI on pure stain area  (Stain 1 / Colour_1)
+//   3. Draw ROI on pure background  (Stain 2 / Colour_2)
+//   4. Stain 3 vector computed automatically (cross product)
+//   5. Batch processing of all TIFF files in folder
+//
+// Requirements: Colour Deconvolution2 plugin (Landini)
+// Output: CSV with Mean_Stain, IntDen, Area per image
+// ============================================================
+
+// Threshold below which an OD vector norm is considered unstable
+od_threshold = 0.05;
+
+// ------------------------------------------------------------
+// Function: measure mean R, G, B of a ROI on an RGB image
+// Returns array [R, G, B]
+// ------------------------------------------------------------
+function measureRGB(img_title) {
+    selectWindow(img_title);
+    run("Duplicate...", "title=temp_rgb_measure");
+    run("Make Composite", "display=Composite");
+
+    Stack.setChannel(1); // Red
+    run("Clear Results"); run("Measure");
+    rv = getResult("Mean", 0);
+
+    Stack.setChannel(2); // Green
+    run("Clear Results"); run("Measure");
+    gv = getResult("Mean", 0);
+
+    Stack.setChannel(3); // Blue
+    run("Clear Results"); run("Measure");
+    bv = getResult("Mean", 0);
+
+    close("temp_rgb_measure");
+
+    result = newArray(rv, gv, bv);
+    return result;
+}
+
+// ------------------------------------------------------------
+// Function: compute normalised OD vector from raw RGB values
+// Exits with error message if norm < od_threshold
+// ------------------------------------------------------------
+function computeODVector(rgb_array) {
+    r_od = -log(rgb_array[0] / 255.0 + 0.001);
+    g_od = -log(rgb_array[1] / 255.0 + 0.001);
+    b_od = -log(rgb_array[2] / 255.0 + 0.001);
+    norm = sqrt(r_od*r_od + g_od*g_od + b_od*b_od);
+    if (norm < od_threshold)
+        exit("Selected ROI gives an unstable OD vector (norm = " + d2s(norm,5) +
+             "). Please select a ROI with a more distinct chromatic signal.");
+    vec = newArray(r_od/norm, g_od/norm, b_od/norm);
+    return vec;
+}
+
+// ------------------------------------------------------------
+// STEP 1: select input folder and open calibration image
+// File matching is case-insensitive: accepts .tif/.tiff/.TIF/.TIFF
+// ------------------------------------------------------------
+input_dir   = getDirectory("Select input folder containing TIFF images");
+getDateAndTime(year, month, dayOfWeek, dayOfMonth, hour, minute, second, msec);
+analysis_date = "" + dayOfMonth + "/" + (month + 1) + "/" + year;
+date_tag = "" + year + IJ.pad(month + 1, 2) + IJ.pad(dayOfMonth, 2);
+output_file = input_dir + "results_staining_" + date_tag + ".csv";
+list = getFileList(input_dir);
+
+calib_file = "";
+for (i = 0; i < list.length; i++) {
+    lower = toLowerCase(list[i]);
+    if (endsWith(lower, ".tiff") || endsWith(lower, ".tif")) {
+        calib_file = list[i];
+        i = list.length; // break
+    }
+}
+if (calib_file == "") exit("No TIFF files found in the selected folder.");
+
+open(input_dir + calib_file);
+calib_title = getTitle();
+run("Set Measurements...", "mean redirect=None decimal=5");
+
+// ------------------------------------------------------------
+// STEP 2: ROI staining — calibrate v1
+// ------------------------------------------------------------
+waitForUser("Calibration — STEP 1 of 2",
+    "Image: " + calib_title +
+    "\n\nDraw a ROI on a region of PURE STAIN (strongest positive area)." +
+    "\nAvoid edges and mixed regions." +
+    "\nPress OK when the ROI is ready.");
+
+rgb1 = measureRGB(calib_title);
+v1   = computeODVector(rgb1);
+
+print("v1 raw RGB: R=" + d2s(rgb1[0],2) + " G=" + d2s(rgb1[1],2) + " B=" + d2s(rgb1[2],2));
+print("v1 (Stain): R=" + d2s(v1[0],5)  + " G=" + d2s(v1[1],5)  + " B=" + d2s(v1[2],5));
+
+// ------------------------------------------------------------
+// STEP 3: ROI background — calibrate v2
+// ------------------------------------------------------------
+selectWindow(calib_title);
+waitForUser("Calibration — STEP 2 of 2",
+    "Image: " + calib_title +
+    "\n\nDraw a ROI on a region of PURE BACKGROUND (unstained area, no cells)." +
+    "\nAvoid any stain contamination." +
+    "\nPress OK when the ROI is ready.");
+
+rgb2 = measureRGB(calib_title);
+v2   = computeODVector(rgb2);
+
+print("v2 raw RGB: R=" + d2s(rgb2[0],2) + " G=" + d2s(rgb2[1],2) + " B=" + d2s(rgb2[2],2));
+print("v2 (BG):    R=" + d2s(v2[0],5)  + " G=" + d2s(v2[1],5)  + " B=" + d2s(v2[2],5));
+
+// ------------------------------------------------------------
+// STEP 4: compute v3 as cross product v1 x v2
+// Exits if norm3 < od_threshold (v1 and v2 too similar)
+// ------------------------------------------------------------
+r3_raw = v1[1]*v2[2] - v1[2]*v2[1];
+g3_raw = v1[2]*v2[0] - v1[0]*v2[2];
+b3_raw = v1[0]*v2[1] - v1[1]*v2[0];
+norm3  = sqrt(r3_raw*r3_raw + g3_raw*g3_raw + b3_raw*b3_raw);
+
+if (norm3 < od_threshold)
+    exit("Stain and background vectors are too similar (cross product norm = " +
+         d2s(norm3,5) + "). Please re-calibrate using more spectrally distinct ROIs.");
+
+v3 = newArray(r3_raw/norm3, g3_raw/norm3, b3_raw/norm3);
+
+print("v3 (Cross): R=" + d2s(v3[0],5) + " G=" + d2s(v3[1],5) + " B=" + d2s(v3[2],5));
+
+// ------------------------------------------------------------
+// STEP 5: confirm vectors and start batch processing
+// ------------------------------------------------------------
+waitForUser("Vector calibration complete",
+    "Calibrated vectors:" +
+    "\nv1 (Stain):  R=" + d2s(v1[0],4) + "  G=" + d2s(v1[1],4) + "  B=" + d2s(v1[2],4) +
+    "\nv2 (BG):     R=" + d2s(v2[0],4) + "  G=" + d2s(v2[1],4) + "  B=" + d2s(v2[2],4) +
+    "\nv3 (Comp):   R=" + d2s(v3[0],4) + "  G=" + d2s(v3[1],4) + "  B=" + d2s(v3[2],4) +
+    "\n\nSee Log window for full precision values." +
+    "\nPress OK to start batch processing.");
+
+close(calib_title);
+
+// ------------------------------------------------------------
+// STEP 6: batch processing
+// Only the original image and the 3 Colour Deconvolution
+// output channels are closed at the end of each iteration.
+// ------------------------------------------------------------
+f = File.open(output_file);
+	
+	macro_version = "1.1.0";
+	ij_version = getVersion();
+
+	print(f, "# ============================================================");
+	print(f, "# Colour Deconvolution Quantification - Batch Analysis Report");
+	print(f, "# ============================================================");
+	print(f, "# Date:             " + analysis_date);
+	print(f, "# Macro version:    " + macro_version);
+	print(f, "# ImageJ version:   " + ij_version);
+	print(f, "# Calibration image:" + calib_file);
+	print(f, "# v1 (Stain):       R=" + d2s(v1[0],5) + ", G=" + d2s(v1[1],5) + ", B=" + d2s(v1[2],5));
+	print(f, "# v2 (Background):  R=" + d2s(v2[0],5) + ", G=" + d2s(v2[1],5) + ", B=" + d2s(v2[2],5));
+	print(f, "# v3 (Computed):    R=" + d2s(v3[0],5) + ", G=" + d2s(v3[1],5) + ", B=" + d2s(v3[2],5));
+	print(f, "# ============================================================");
+	print(f, "Filename,Mean_Stain,IntDen_Stain,Area_Total");
+
+
+for (i = 0; i < list.length; i++) {
+    lower = toLowerCase(list[i]);
+    if (endsWith(lower, ".tiff") || endsWith(lower, ".tif")) {
+        open(input_dir + list[i]);
+        base_title = getTitle();
+
+        run("Colour Deconvolution2", "vectors=[User values] " +
+            "[r1]=" + v1[0] + " [g1]=" + v1[1] + " [b1]=" + v1[2] + " " +
+            "[r2]=" + v2[0] + " [g2]=" + v2[1] + " [b2]=" + v2[2] + " " +
+            "[r3]=" + v3[0] + " [g3]=" + v3[1] + " [b3]=" + v3[2]);
+
+        colour1_title = base_title + "-(Colour_1)";
+        colour2_title = base_title + "-(Colour_2)";
+        colour3_title = base_title + "-(Colour_3)";
+
+        selectWindow(colour1_title);
+        run("Invert");
+        run("Set Measurements...", "area mean integrated redirect=None decimal=3");
+        run("Clear Results");
+        run("Measure");
+
+        mean_val = getResult("Mean",   0);
+        intden   = getResult("IntDen", 0);
+        area     = getResult("Area",   0);
+
+        print(f, "\"" + list[i] + "\"" + "," + mean_val + "," + intden + "," + area);
+
+        // Close only the original image and the 3 deconvolution output channels
+        close(base_title);
+        close(colour1_title);
+        close(colour2_title);
+        close(colour3_title);
+	close("Colour Deconvolution");
+    }
+}
+
+File.close(f);
+print("Done. Results saved to: " + output_file);

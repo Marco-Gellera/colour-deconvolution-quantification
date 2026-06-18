@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+title: "Color Deconvolution Quantification for Staining Kits of in Vitro Cell Models"
+type: software
+version: "1.1.0"
+date-released: "YYYY-MM-DD"
+doi: "10.5281/zenodo.XXXXXXX"
+url: "https://doi.org/10.5281/zenodo.XXXXXXX"
+repository-code: "https://github.com/XXXXXXX/colour-deconvolution-quantification"
+license: MIT
+authors:
+  - family-names: "Gellera"
+    given-names: "Marco"
+    orcid: "https://orcid.org/0009-0001-8096-1148"
+    affiliation: "University of Milan, Department of Food, Environmental and Nutritional Sciences (DeFENS)"
+  - family-names: "Marino"
+    given-names: "Mirko"
+    orcid: "https://orcid.org/0000-0001-9913-4380"
+    affiliation: "University of Milan, Department of Food, Environmental and Nutritional Sciences (DeFENS)"
+  - family-names: "Del Bo'"
+    given-names: "Cristian"
+    orcid: "https://orcid.org/0000-0001-7562-377X"
+    affiliation: "University of Milan, Department of Food, Environmental and Nutritional Sciences (DeFENS)"
+abstract: >
+  ImageJ macro for the automated, reproducible quantification of chromogenic
+  staining intensity in brightfield microscopy images of in vitro cell models.
+  The macro implements a colour deconvolution-based approach with interactive,
+  user-defined stain vector calibration, enabling application across different
+  staining kits without modification to the core code. Originally developed
+  for Senescence-Associated β-galactosidase (SA-β-gal) quantification in
+  D-galactose-treated Caco-2 cells.
+keywords:
+  - ImageJ
+  - colour deconvolution
+  - brightfield microscopy
+  - chromogenic staining
+  - beta-galactosidase
+  - cellular senescence
+  - in vitro
+  - image analysis
+  - Caco-2
