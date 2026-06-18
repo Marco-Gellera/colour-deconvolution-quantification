@@ -1,6 +1,7 @@
 # Color Deconvolution Quantification for Staining Kits of *in Vitro* Cell Models
 
 **DOI:** [10.5281/zenodo.20747341](https://doi.org/10.5281/zenodo.20747341)
+
 **Code licence:** [MIT](LICENSE_code.txt)  
 **Data licence:** [CC-BY 4.0](LICENSE_data.txt)  
 **Software:** [ImageJ 1.54t](https://imagej.net)
