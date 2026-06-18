@@ -27,4 +27,4 @@ When using this work in published research, please cite:
 
   Gellera M, Marino M, Del Bo' C. Color Deconvolution Quantification for Staining Kits
   of in Vitro Cell Models [Software]. Zenodo.
-  DOI: to be assigned
+  DOI:10.5281/zenodo.20747341
