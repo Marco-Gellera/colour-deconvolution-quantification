@@ -1,7 +1,7 @@
 # Color Deconvolution Quantification for Staining Kits of *in Vitro* Cell Models
 
 **DOI: to be assigned** 
-<!--[10.5281/zenodo.XXXXXXX](https://doi.org/10.5281/zenodo.XXXXXXX)-->
+<!--[10.5281/zenodo.20747341](https://doi.org/10.5281/zenodo.20747341)-->
 **Code licence:** [MIT](LICENSE_code.txt)  
 **Data licence:** [CC-BY 4.0](LICENSE_data.txt)  
 **Software:** [ImageJ 1.54t](https://imagej.net)
@@ -144,7 +144,7 @@ The `example_images/` folder contains a representative subset of the dataset use
 - `negative_controls/` — 11 images: Caco-2 cells without D-galactose treatment (SA-β-gal negative)
 - `positive_controls/` — 12 images: Caco-2 cells with D-galactose treatment (SA-β-gal positive)
 
-> **Note:** Example images (avaibale at https://doi.org/10.5281/zenodo.XXXXXXX) are archived on Zenodo under **embargo** until publication of the associated manuscript. They will be made publicly available upon paper acceptance. The macro and documentation are immediately available under the terms of their respective licences.
+> **Note:** Example images (avaibale at https://doi.org/10.5281/zenodo.20747341) are archived on Zenodo under **embargo** until publication of the associated manuscript. They will be made publicly available upon paper acceptance. The macro and documentation are immediately available under the terms of their respective licences.
 
 Expected output for the example dataset is provided in `example_output/results_example.csv`.
 
@@ -158,8 +158,8 @@ Expected output for the example dataset is provided in `example_output/results_e
 ├── LICENSE_code.txt                                 # MIT licence (macro)
 ├── LICENSE_data.txt                                 # CC-BY 4.0 (documentation, data)
 ├── example_images/
-│   ├── negative_controls/                           # 10 TIFF images (embargoed)
-│   └── positive_controls/                           # 10 TIFF images (embargoed)
+│   ├── negative_controls/                           # 11 TIFF images (embargoed)
+│   └── positive_controls/                           # 12 TIFF images (embargoed)
 └── example_output/
     └── results_example.csv                          # Expected output
 ```
@@ -170,7 +170,7 @@ Expected output for the example dataset is provided in `example_output/results_e
 
 If you use this macro in your research, please cite:
 
-> Gellera M, Marino M, Del Bo' C. *Color Deconvolution Quantification for Staining Kits of in Vitro Cell Models* [Software]. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
+> Gellera M, Marino M, Del Bo' C. *Color Deconvolution Quantification for Staining Kits of in Vitro Cell Models* [Software]. Zenodo. https://doi.org/10.5281/zenodo.20747341
 
 A BibTeX entry is provided below for convenience:
 
@@ -181,12 +181,10 @@ A BibTeX entry is provided below for convenience:
                   of in Vitro Cell Models},
   year         = {2026},
   publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.XXXXXXX},
-  url          = {https://doi.org/10.5281/zenodo.XXXXXXX}
+  doi          = {10.5281/zenodo.20747341},
+  url          = {https://doi.org/10.5281/zenodo.20747341}
 }
 ```
-
-*Replace `XXXXXXX` with the actual Zenodo DOI assigned upon deposition.*
 
 ---
 
