@@ -153,7 +153,7 @@ Expected output for the example dataset is provided in `example_output/results_e
 ## Repository structure
 
 ```
-├── macro_colour_deconvolution_quantification.ijm   # ImageJ macro (MIT licence)
+├── macro_colour_deconvolution_quantification.ijm.txt   # ImageJ macro (MIT licence)
 ├── README.md                                        # This file (CC-BY 4.0)
 ├── LICENSE_code.txt                                 # MIT licence (macro)
 ├── LICENSE_data.txt                                 # CC-BY 4.0 (documentation, data)
