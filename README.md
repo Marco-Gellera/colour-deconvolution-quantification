@@ -62,7 +62,7 @@ Download ImageJ from [https://imagej.net/ij/download.html](https://imagej.net/ij
 ### 3. Macro installation
 1. Open ImageJ.
 2. Go to `Plugins → Macros → Install...`
-3. Select `macro_colour_deconvolution_quantification.ijm`.  
+3. Select `macro_colour_deconvolution_quantification.ijm.txt`.  
    Alternatively, open the macro directly via `Plugins → Macros → Run...` for single-session use.
 
 ---
@@ -93,7 +93,7 @@ After confirmation, the macro processes all TIFF files in the selected folder se
 3. Mean grey value, Integrated Density, and Area are measured over the entire image.
 
 **Step 4 — Output**  
-Results are saved as `results_staining.csv` in the input folder. The CSV header includes the calibrated stain vectors used, ensuring full traceability.
+Results are saved as `results_staining_YYYYMMDD.csv` in the input folder. The CSV header includes the calibrated stain vectors used, ensuring full traceability.
 
 ### Output file structure
 
@@ -113,7 +113,7 @@ image_02.tiff, 38.76, 321643776, 8294400
 | `IntDen_Stain` | Integrated Density = Area × Mean (useful for area-normalised comparisons) |
 | `Area_Total` | Total measured area in pixels |
 
-**Primary outcome variable:** `Mean_Stain`. This represents the mean intensity of the inverted deconvolved stain channel and is used as an image-level proxy of staining burden.This macro does not perform cell segmentation. Therefore, Mean_Stain should not be interpreted as per-cell staining intensity unless cell density and field composition are comparable across group. If confluency varies systematically between experimental groups, normalisation by cell area is recommended prior to statistical analysis.
+**Primary outcome variable:** `Mean_Stain`. The macro provides a continuous image-level metric based on the mean intensity of the inverted deconvolved stain channel, and is used as an image-level proxy of staining burden.This macro does not perform cell segmentation. Therefore, Mean_Stain should not be interpreted as per-cell staining intensity unless cell density and field composition are comparable across group. If confluency varies systematically between experimental groups, normalisation by cell area is recommended prior to statistical analysis.
 
 ---
 
